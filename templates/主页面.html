@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主页面</title>
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --text-color: #333;
+            --text-light: #666;
+            --white: #fff;
+            --spacing-sm: 10px;
+            --spacing-md: 20px;
+            --spacing-lg: 30px;
+            --spacing-xl: 50px;
+            --border-radius: 5px;
+            --border-radius-lg: 15px;
+            --shadow: 0 10px 30px rgba(0,0,0,0.2);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .welcome-container {
+            background: var(--white);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: var(--spacing-md);
+            font-size: 2.5em;
+        }
+
+        p {
+            color: var(--text-light);
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .emoji {
+            font-size: 3em;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .user-info {
+            margin: var(--spacing-lg) 0;
+        }
+
+        .user-avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0 auto var(--spacing-sm);
+        }
+
+        .user-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .user-email {
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .navigation {
+            margin: var(--spacing-lg) 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+
+        .nav-item {
+            display: inline-flex;
+            align-items: center;
+            margin: 0 var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--primary-color);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .nav-item:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-item i {
+            margin-right: 8px;
+            font-size: 1.1em;
+        }
+
+        small {
+            color: var(--text-light);
+        }
+
+        @media (max-width: 480px) {
+            .welcome-container {
+                padding: var(--spacing-lg);
+            }
+
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-item {
+                width: 80%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+    <!-- 引入图标库 -->
+{#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">#}
+</head>
+<body>
+<div class="welcome-container">
+    <div class="emoji">👋</div>
+    <h1>欢迎!</h1>
+    <p>这是我们的自定义欢迎页面</p>
+
+    <div class="user-info">
+        {% if user %}
+        <div class="user-avatar">{{ user.name|first }}</div>
+        <div class="user-name">{{ user.name }}</div>
+        <div class="user-email">{{ user.email }}</div>
+        {% endif %}
+    </div>
+
+    <div class="navigation">
+        <a class="nav-item"  href="/profile/">
+            <i class="fas fa-user"></i>个人资料
+        </a>
+        <a class="nav-item" href="/gallery">
+            <i class="fas fa-cog"></i>个人图片
+        </a>
+
+        <a class="nav-item" href="/logout" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>退出
+        </a>
+
+
+    </div>
+<!-- 在主页面添加公共相册卡片 -->
+<div class="feature-card">
+    <h3><i class="fas fa-globe"></i> 公共相册</h3>
+    <p>查看所有人分享的照片，发现美好瞬间</p>
+</div>
+    <div class="navigation">
+        <a class="nav-item" href="{% url 'public_gallery' %}" >
+            <i class="fas fa-user"></i>进入公共相册</a>
+    </div>
+    <p><small>基于 Django 框架构建</small></p>
+</div>
+
+{#<script>#}
+{#    function logout() {#}
+{#        // 这里可以添加退出登录的逻辑#}
+{#        alert('退出登录');#}
+{#    }#}
+{#</script>#}
+</body>
+</html>

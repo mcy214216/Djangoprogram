@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: #333;
+            font-weight: 600;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .already-logged-in {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .already-logged-in h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .already-logged-in p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: block;
+            padding: 14px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .error-msg {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f44336;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .error-msg::before {
+            content: "⚠";
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding: 14px 14px 14px 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+
+        .input-with-icon input:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            background-color: #fff;
+            outline: none;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input {
+            margin-right: 8px;
+        }
+
+        .forgot-password {
+            color: #4a90e2;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .forgot-password:hover {
+            color: #1a73e8;
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(37, 117, 252, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(37, 117, 252, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .signup-link a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+            margin-left: 5px;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 20px;
+            }
+
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .forgot-password {
+                margin-top: 10px;
+            }
+
+            .btn-group {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- 检查用户是否已登录 -->
+        {% if request.session.id %}
+        <div class="already-logged-in">
+            <h3>🎉 您已经登录了！</h3>
+            <p>您已经以 <strong>{{ request.session.user_name }}</strong> 的身份登录</p>
+            <div class="btn-group">
+                <a href="{% url '主页面' %}" class="btn btn-primary">前往主页面</a>
+                <a href="{% url 'personal_gallery' %}" class="btn btn-success">前往个人相册</a>
+                <a href="{% url 'public_gallery' %}" class="btn btn-primary">查看公共相册</a>
+                <a href="{% url '用户退出' %}" class="btn btn-danger">退出登录</a>
+            </div>
+        </div>
+        {% else %}
+        <!-- 未登录状态：显示登录表单 -->
+        <div class="login-header">
+            <h2>用户登录</h2>
+            <p>欢迎回来，请登录您的账户</p>
+        </div>
+
+        <!-- 错误消息显示区域 -->
+        {% if error_msg %}
+            <div class="error-msg">{{ error_msg }}</div>
+        {% endif %}
+
+        <form action="/login/" method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="Account">账号</label>
+                <div class="input-with-icon">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="Account" name="Account" placeholder="请输入账号" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <div class="input-with-icon">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" id="password" name="password" placeholder="请输入密码" required>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">记住我</label>
+                </div>
+                <a href="#" class="forgot-password">忘记密码?</a>
+            </div>
+
+            <button type="submit" class="submit-btn">登录</button>
+        </form>
+
+        <div class="signup-link">
+            还没有账户? <a href="/register/">立即注册</a><br>
+            <a href="/">返回首页</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // 简单的表单验证 - 只在未登录状态下执行
+        {% if not request.session.id %}
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const username = document.getElementById('Account').value;
+            const password = document.getElementById('password').value;
+
+            if (username.trim() === '') {
+                e.preventDefault();
+                alert('请输入账号');
+                return;
+            }
+
+            if (password.trim() === '') {
+                e.preventDefault();
+                alert('请输入密码');
+                return;
+            }
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

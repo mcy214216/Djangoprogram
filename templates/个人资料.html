@@ -1,0 +1,350 @@
+<!--{#<!DOCTYPE html>#}-->
+<!--{#<html lang="en">#}-->
+<!--{#<head>#}-->
+<!--{#    <meta charset="UTF-8">#}-->
+<!--{#    <title>个人资料</title>#}-->
+<!--{#</head>#}-->
+<!--{#<body>#}-->
+<!--{#<div>#}-->
+<!--{#    {%if user%}#}-->
+<!--{#    <div >用户名：{{ user.name}}<div><a href="/settings">修改</a></div></div>#}-->
+<!--{#    <div >年龄：{{ user.age}}<div><a href="/settings">修改</a></div></div>#}-->
+<!--{#    <div >邮箱：{{ user.email }}<div><a href="/settings">修改</a></div></div>#}-->
+<!--{#    <div >性别：{{ user.sex }}<div><a href="/settings">修改</a></div></div>#}-->
+<!--{#    {% endif %}#}-->
+<!--{#</div>#}-->
+<!--{#</body>#}-->
+<!--{#</html>#}-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            margin: 0 auto 15px;
+            background-color: #fff;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #6a11cb;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            font-size: 16px;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .profile-content {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #6a11cb;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid #6a11cb;
+        }
+
+        .info-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-label i {
+            margin-right: 8px;
+            color: #6a11cb;
+            width: 20px;
+            text-align: center;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .edit-btn {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .edit-btn i {
+            margin-right: 6px;
+        }
+
+        .edit-btn:hover {
+            background: #5a0db3;
+            transform: translateY(-2px);
+        }
+
+        .profile-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .primary-btn {
+            background: #6a11cb;
+            color: white;
+            border: none;
+        }
+
+        .secondary-btn {
+            background: transparent;
+            color: #6a11cb;
+            border: 2px solid #6a11cb;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            .profile-header {
+                padding: 20px;
+            }
+
+            .profile-content {
+                padding: 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <h1 class="profile-name">{% if user %}{{ user.name }}{% else %}用户名{% endif %}</h1>
+            <p class="profile-bio">欢迎来到我的个人资料页面，这里展示了我的一些基本信息。</p>
+        </div>
+
+        <div class="profile-content">
+            <div class="section-title">
+                <i class="fas fa-info-circle"></i>
+                <span>基本信息</span>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-user"></i>
+                        <span>用户名</span>
+                    </div>
+                    <div class="info-value">{% if user %}{{ user.name }}{% else %}未设置{% endif %}</div>
+                    <a href="/settings" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                        <span>修改</span>
+                    </a>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>年龄</span>
+                    </div>
+                    <div class="info-value">{% if user %}{{ user.age }}{% else %}未设置{% endif %}</div>
+                    <a href="/settings" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                        <span>修改</span>
+                    </a>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-envelope"></i>
+                        <span>邮箱</span>
+                    </div>
+                    <div class="info-value">{% if user %}{{ user.email }}{% else %}未设置{% endif %}</div>
+                    <a href="/settings" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                        <span>修改</span>
+                    </a>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-venus-mars"></i>
+                        <span>性别</span>
+                    </div>
+                    <div class="info-value">{% if user %}{{ user.gender }}{% else %}未设置{% endif %}</div>
+                    <a href="/settings" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                        <span>修改</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-cog"></i>
+                <span>账户设置</span>
+            </div>
+
+            <div class="profile-actions">
+                <a href="/settings" class="action-btn primary-btn">
+                    <i class="fas fa-user-edit"></i>
+                    <span>编辑个人资料</span>
+                </a>
+                <a href="/privacy" class="action-btn secondary-btn">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>隐私设置</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+<!--    <script>-->
+<!--        // 添加一些简单的交互效果-->
+<!--        document.addEventListener('DOMContentLoaded', function() {-->
+<!--            const infoItems = document.querySelectorAll('.info-item');-->
+
+<!--            infoItems.forEach(item => {-->
+<!--                item.addEventListener('mouseenter', function() {-->
+<!--                    this.style.transform = 'translateY(-5px)';-->
+<!--                });-->
+
+<!--                item.addEventListener('mouseleave', function() {-->
+<!--                    this.style.transform = 'translateY(0)';-->
+<!--                });-->
+<!--            });-->
+
+<!--            // 模拟用户数据（在实际应用中，这些数据应该来自后端）-->
+<!--            // 这里仅用于演示-->
+<!--            const userData = {-->
+<!--                name: "张三",-->
+<!--                age: 28,-->
+<!--                email: "zhangsan@example.com",-->
+<!--                sex: "男"-->
+<!--            };-->
+
+<!--            // 在实际应用中，这些数据应该来自模板变量-->
+<!--            // 这里只是演示如何更新页面内容-->
+<!--            function updateUserInfo() {-->
+<!--                document.querySelector('.profile-name').textContent = userData.name;-->
+<!--                document.querySelectorAll('.info-value')[0].textContent = userData.name;-->
+<!--                document.querySelectorAll('.info-value')[1].textContent = userData.age;-->
+<!--                document.querySelectorAll('.info-value')[2].textContent = userData.email;-->
+<!--                document.querySelectorAll('.info-value')[3].textContent = userData.sex;-->
+<!--            }-->
+
+<!--            // 模拟从服务器获取数据后的更新-->
+<!--            // 在实际应用中不需要这个定时器-->
+<!--            setTimeout(updateUserInfo, 500);-->
+<!--        });-->
+<!--    </script>-->
+</body>
+</html>

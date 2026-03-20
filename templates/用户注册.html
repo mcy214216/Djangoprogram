@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+
+        .register-header {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .register-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .register-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+            outline: none;
+        }
+
+        .password-requirements {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .register-footer a {
+            color: #6a11cb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .register-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+            
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .alert-error {
+            background-color: #ffeaea;
+            color: #d63031;
+            border-left: 4px solid #d63031;
+        }
+
+        .alert-success {
+            background-color: #e8f8ef;
+            color: #2ecc71;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #1976d2;
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                max-width: 100%;
+            }
+
+            .register-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>创建账户</h1>
+            <p>加入我们，开始您的旅程</p>
+        </div>
+
+        <div class="register-form">
+            <!-- 消息提示 -->
+            {% if messages %}
+            <div class="messages" id="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            <script>
+                // 消息提示几秒后自动消失
+                document.addEventListener('DOMContentLoaded', function() {
+                    const messages = document.getElementById('messages');
+                    if (messages) {
+                        setTimeout(function() {
+                            messages.style.transition = 'opacity 0.5s ease';
+                            messages.style.opacity = '0';
+                            setTimeout(function() {
+                                messages.style.display = 'none';
+                            }, 500);
+                        }, 3000); // 3秒后开始消失
+                    }
+                });
+            </script>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" class="form-control"
+                           placeholder="请输入用户名" value="{{ request.POST.username }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">账号</label>
+                    <input type="text" id="Account" name="Account" class="form-control"
+                           placeholder="请输入账号" value="{{ request.POST.Account }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">电子邮箱 (可选)</label>
+                    <input type="email" id="email" name="email" class="form-control"
+                           placeholder="请输入电子邮箱" value="{{ request.POST.email }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="请输入密码" required>
+                    <div class="password-requirements">密码长度至少6位</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">确认密码</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                           placeholder="请再次输入密码" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">年龄</label>
+                    <input type="text" id="age" name="age" class="form-control"
+                           placeholder="请输入年龄" required>
+                </div>
+                <div class="form-group">
+                    <label for="sex">性别</label>
+                    <select id="sex" name="sex" class="form-control" required>
+                        <option value="">请选择性别</option>
+                        <option value="男" {% if request.POST.sex == '男' %}selected{% endif %}>男</option>
+                        <option value="女" {% if request.POST.sex == '女' %}selected{% endif %}>女</option>
+                    </select>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">注册</button>
+            </form>
+
+            <div class="register-footer">
+                <p>已有账户？  <a href="/login/">立即登录</a></p>
+                <p>  <a href="/">返回首页</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 简单的表单验证
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            // 检查密码长度
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('密码长度至少为6位');
+                return;
+            }
+
+            // 检查密码确认
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('两次输入的密码不一致');
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

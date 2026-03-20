@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人相册 - Django</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 所有CSS样式保持不变 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex-grow: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .upload-btn, .view-mode-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-mode-btn {
+            background-color: #9b59b6;
+        }
+
+        .upload-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .view-mode-btn:hover {
+            background-color: #8e44ad;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .image-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .image-container {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .image-card:hover .image-container img {
+            transform: scale(1.08);
+        }
+
+        /* 删除按钮样式 */
+        .image-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-card:hover .image-actions {
+            opacity: 1;
+        }
+
+        .delete-btn {
+            background-color: rgba(231, 76, 60, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(192, 57, 43, 0.9);
+        }
+
+        .image-info {
+            padding: 18px;
+        }
+
+        .image-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .image-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        .image-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .image-description {
+            color: #5a6c7d;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .image-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tag {
+            background-color: #ecf0f1;
+            color: #34495e;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+        }
+
+        /* 上传表单样式 */
+        .upload-form {
+            display: none;
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .submit-btn, .cancel-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #e74c3c;
+        }
+
+        .modal-body {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .modal-image {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .modal-info h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.3rem;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        /* 纯图片浏览模式 */
+        .image-only-mode {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .image-only-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .back-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 纯图片浏览模式的删除按钮 */
+        .image-only-actions {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .image-only-delete-btn {
+            background-color: rgba(231, 76, 60, 0.8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .image-only-delete-btn:hover {
+            background-color: rgba(192, 57, 43, 0.9);
+        }
+
+        .image-only-container {
+            max-width: 90%;
+            max-height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-only-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .image-counter {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 25px 0;
+            color: #7f8c8d;
+            border-top: 1px solid #eaeaea;
+        }
+
+        @media (max-width: 1100px) {
+            .modal-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>我的个人相册</h1>
+            <div class="user-info" style="text-align: center; padding: 10px;">
+                {% if user %}
+                <span>欢迎！{{ user.name }}</span>
+                <a href="{% url '用户退出' %}" style="margin-left: 10px;" >退出登录</a>
+                {% endif %}
+            </div>
+        <a  href="{% url 'public_gallery' %}" >
+                     <i class="fas fa-user"></i>进入公共相册</a><br>
+
+        <a  href="{% url '主页面' %}" >
+                     <i class="fas fa-user"></i>返回主页面</a>
+
+            <p class="subtitle">记录生活点滴，珍藏美好回忆</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-count">{{ context.total_count }}</div>
+                    <div class="stat-label">总照片数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="location-count">{{ context.location_count }}</div>
+                    <div class="stat-label">拍摄地点</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="year-count">{{ context.year_count }}</div>
+                    <div class="stat-label">记录年份</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 上传表单 -->
+        <div class="upload-form" id="upload-form">
+            <h2 class="form-title">上传新照片</h2>
+            <form id="photo-form" enctype="multipart/form-data" action="{% url 'upload_photo' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="photo-title">照片标题</label>
+                    <input type="text" id="photo-title" name="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo-file">选择照片</label>
+                    <input type="file" id="photo-file" name="image" accept="image/*" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo-date">拍摄日期</label>
+                    <input type="date" id="photo-date" name="taken_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo-location">拍摄地点</label>
+                    <input type="text" id="photo-location" name="location" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo-description">照片描述</label>
+                    <textarea id="photo-description" name="description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo-camera">拍摄设备</label>
+                    <input type="text" id="photo-camera" name="camera">
+                </div>
+
+                <div class="form-group">
+                    <label for="photo-tags">标签（用逗号分隔）</label>
+                    <input type="text" id="photo-tags" name="tags" placeholder="例如：旅行, 自然, 风景">
+                </div>
+
+                <div class="form-group">
+                    <label for="photo-category">分类</label>
+                    <select id="photo-category" name="category">
+                        <option value="travel">旅行</option>
+                        <option value="family">家庭</option>
+                        <option value="friends">朋友</option>
+                        <option value="nature">自然</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancel-upload">取消</button>
+                    <button type="submit" class="submit-btn">上传照片</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="搜索照片标题、描述或地点...">
+            </div>
+
+            <div class="filter-section">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-layer-group"></i> 全部
+                </button>
+                <button class="filter-btn" data-filter="travel">
+                    <i class="fas fa-map-marked-alt"></i> 旅行
+                </button>
+                <button class="filter-btn" data-filter="family">
+                    <i class="fas fa-home"></i> 家庭
+                </button>
+                <button class="filter-btn" data-filter="friends">
+                    <i class="fas fa-user-friends"></i> 朋友
+                </button>
+                <button class="filter-btn" data-filter="nature">
+                    <i class="fas fa-tree"></i> 自然
+                </button>
+                <button class="filter-btn" data-filter="other">
+                    <i class="fas fa-tree"></i> 其他
+                </button>
+
+            </div>
+
+
+
+
+
+            <div class="action-buttons">
+                <button class="view-mode-btn" id="view-mode-btn">
+                    <i class="fas fa-expand"></i> 纯图片浏览
+                </button>
+                <button class="upload-btn" id="upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i> 上传照片
+                </button>
+                <button class="refresh-btn" id="refresh-btn" style="background-color: #3498db;">
+                    <i class="fas fa-sync-alt"></i> 刷新
+                </button>
+            </div>
+        </div>
+
+        <!-- 加载动画 -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>加载中...</p>
+        </div>
+
+        <div class="gallery" id="image-gallery">
+            <!-- 使用Django模板语法渲染图片 -->
+            {% for photo in context.photos %}
+            <div class="image-card" data-category="{{ photo.category }}" data-id="{{ photo.id }}">
+                <div class="image-container">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.title }}">
+                    <!-- 删除按钮 -->
+                    <div class="image-actions">
+                        <button class="delete-btn" data-photo-id="{{ photo.id }}" title="删除照片">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="image-info">
+                    <h3 class="image-title">{{ photo.title }}</h3>
+                    <div class="image-meta">
+                        <div class="image-date">
+                            <i class="far fa-calendar-alt"></i> {{ photo.taken_date }}
+                        </div>
+                        <div class="image-location">
+                            <i class="fas fa-map-marker-alt"></i> {{ photo.location }}
+                        </div>
+                    </div>
+                    <p class="image-description">{{ photo.description }}</p>
+                    <div class="image-tags">
+                        {% for tag in photo.tags_list %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div id="empty-state" class="empty-state">
+                <i class="fas fa-images"></i>
+                <h3>还没有照片</h3>
+                <p>点击"上传照片"按钮添加您的第一张照片</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <footer>
+            <p>© 2023 我的个人相册 | 使用Django构建 | 共 <span id="footer-count">{{ context.total_count }}</span> 张照片</p>
+        </footer>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">确认删除</h2>
+                <button class="close-btn" id="close-delete-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除这张照片吗？此操作无法撤销。</p>
+                <div class="form-actions" style="margin-top: 120px;">
+                    <button class="cancel-btn" id="cancel-delete">取消</button>
+                    <button class="submit-btn" id="confirm-delete" style="background-color: #e74c3c;">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片详情模态框 -->
+    <div class="modal" id="image-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">图片详情</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-image">
+                    <img id="modal-image" src="" alt="">
+                </div>
+                <div class="modal-info">
+                    <h3>照片信息</h3>
+                    <div class="info-item">
+                        <div class="info-label">拍摄时间</div>
+                        <div class="info-value" id="modal-date"></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">拍摄地点</div>
+                        <div class="info-value" id="modal-location"></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">照片描述</div>
+                        <div class="info-value" id="modal-description"></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">照片标签</div>
+                        <div class="image-tags" id="modal-tags">
+                            <!-- 标签将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">拍摄设备</div>
+                        <div class="info-value" id="modal-camera"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 纯图片浏览模式 -->
+    <div class="image-only-mode" id="image-only-mode">
+        <div class="image-only-header">
+            <button class="back-btn" id="back-btn">
+                <i class="fas fa-arrow-left"></i> 返回相册
+            </button>
+            <!-- 纯图片浏览模式的删除按钮 -->
+            <div class="image-only-actions">
+                <button class="image-only-delete-btn" id="image-only-delete-btn" data-photo-id="">
+                    <i class="fas fa-trash"></i> 删除照片
+                </button>
+            </div>
+            <div class="image-counter" id="image-counter">1 / 0</div>
+        </div>
+        <div class="image-only-container">
+            <img id="image-only-img" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        // 从DOM元素获取照片数据
+        function getImageDataFromDOM() {
+            const imageCards = document.querySelectorAll('.image-card');
+            const imageData = [];
+
+            imageCards.forEach(card => {
+                const photoId = card.getAttribute('data-id');
+                const category = card.getAttribute('data-category');
+                const title = card.querySelector('.image-title').textContent;
+                const description = card.querySelector('.image-description').textContent;
+                const location = card.querySelector('.image-location').textContent.replace(' ', '').replace(' ', '');
+                const date = card.querySelector('.image-date').textContent.replace(' ', '').split(' ')[1];
+                const imageUrl = card.querySelector('img').src;
+
+                // 获取标签
+                const tags = [];
+                card.querySelectorAll('.tag').forEach(tag => {
+                    tags.push(tag.textContent);
+                });
+
+                imageData.push({
+                    id: parseInt(photoId),
+                    category: category,
+                    title: title,
+                    description: description,
+                    location: location,
+                    date: date,
+                    url: imageUrl,
+                    tags: tags,
+                    camera: '' // 可以从其他地方获取或留空
+                });
+            });
+
+            return imageData;
+        }
+
+        // 初始化照片数据
+        let imageData = getImageDataFromDOM();
+        let currentFilteredImages = imageData;
+
+        // 获取DOM元素
+        const gallery = document.getElementById('image-gallery');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('search-input');
+        const modal = document.getElementById('image-modal');
+        const closeModal = document.getElementById('close-modal');
+        const emptyState = document.getElementById('empty-state');
+        const uploadForm = document.getElementById('upload-form');
+        const uploadBtn = document.getElementById('upload-btn');
+        const cancelUpload = document.getElementById('cancel-upload');
+        const photoForm = document.getElementById('photo-form');
+        const viewModeBtn = document.getElementById('view-mode-btn');
+        const imageOnlyMode = document.getElementById('image-only-mode');
+        const backBtn = document.getElementById('back-btn');
+        const imageOnlyImg = document.getElementById('image-only-img');
+        const imageCounter = document.getElementById('image-counter');
+        const imageOnlyDeleteBtn = document.getElementById('image-only-delete-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const loading = document.getElementById('loading');
+
+        // 删除功能相关元素
+        const deleteModal = document.getElementById('delete-modal');
+        const closeDeleteModal = document.getElementById('close-delete-modal');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const confirmDelete = document.getElementById('confirm-delete');
+        let currentPhotoId = null;
+
+        // 当前纯图片浏览的索引
+        let currentImageIndex = 0;
+
+        // 筛选功能
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 更新活动按钮
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // 筛选图片
+                const filter = btn.getAttribute('data-filter');
+                filterImages(filter, searchInput.value);
+            });
+        });
+
+        // 搜索功能
+        searchInput.addEventListener('input', () => {
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            filterImages(activeFilter, searchInput.value);
+        });
+
+        // 筛选和搜索图片
+        function filterImages(filter, searchTerm) {
+            let filteredImages = imageData;
+
+            // 应用筛选
+            if (filter !== 'all') {
+                filteredImages = filteredImages.filter(img => img.category === filter);
+            }
+
+            // 应用搜索
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filteredImages = filteredImages.filter(img =>
+                    img.title.toLowerCase().includes(term) ||
+                    img.description.toLowerCase().includes(term) ||
+                    img.location.toLowerCase().includes(term) ||
+                    img.tags.some(tag => tag.toLowerCase().includes(term))
+                );
+            }
+
+            currentFilteredImages = filteredImages;
+
+            // 更新显示
+            updateGalleryDisplay(filteredImages);
+        }
+
+        // 更新相册显示
+        function updateGalleryDisplay(images) {
+            const imageCards = document.querySelectorAll('.image-card');
+
+            imageCards.forEach(card => {
+                const photoId = parseInt(card.getAttribute('data-id'));
+                const shouldShow = images.some(img => img.id === photoId);
+
+                card.style.display = shouldShow ? 'block' : 'none';
+            });
+
+            // 如果没有图片显示，显示空状态
+            const visibleCount = images.length;
+            if (visibleCount === 0 && emptyState) {
+                emptyState.style.display = 'block';
+            } else if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+        }
+
+        // 打开模态框显示图片详情
+        function openModal(image) {
+            document.getElementById('modal-title').textContent = image.title;
+            document.getElementById('modal-image').src = image.url;
+            document.getElementById('modal-image').alt = image.title;
+            document.getElementById('modal-date').textContent = image.date;
+            document.getElementById('modal-location').textContent = image.location;
+            document.getElementById('modal-description').textContent = image.description;
+            document.getElementById('modal-camera').textContent = image.camera;
+
+            const modalTags = document.getElementById('modal-tags');
+            modalTags.innerHTML = image.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+
+            modal.style.display = 'flex';
+        }
+
+        // 关闭模态框
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // 点击模态框外部关闭
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // 上传表单显示/隐藏
+        uploadBtn.addEventListener('click', () => {
+            uploadForm.style.display = 'block';
+        });
+
+        cancelUpload.addEventListener('click', () => {
+            uploadForm.style.display = 'none';
+            photoForm.reset();
+        });
+
+        // 处理照片上传 - 使用传统表单提交而不是AJAX
+        photoForm.addEventListener('submit', (e) => {
+            // 显示加载动画
+            loading.style.display = 'block';
+
+            // 表单将通过传统方式提交，不需要AJAX处理
+            // 服务器处理后会重定向回当前页面
+        });
+
+        // 纯图片浏览模式
+        viewModeBtn.addEventListener('click', () => {
+            if (currentFilteredImages.length === 0) {
+                alert('没有可浏览的图片！');
+                return;
+            }
+
+            currentImageIndex = 0;
+            showImageInViewMode();
+            imageOnlyMode.style.display = 'flex';
+        });
+
+        backBtn.addEventListener('click', () => {
+            imageOnlyMode.style.display = 'none';
+        });
+
+        function showImageInViewMode() {
+            const image = currentFilteredImages[currentImageIndex];
+            imageOnlyImg.src = image.url;
+            imageOnlyImg.alt = image.title;
+            imageCounter.textContent = `${currentImageIndex + 1} / ${currentFilteredImages.length}`;
+            // 设置删除按钮的data-photo-id
+            imageOnlyDeleteBtn.setAttribute('data-photo-id', image.id);
+        }
+
+        // 添加键盘导航
+        document.addEventListener('keydown', (e) => {
+            if (imageOnlyMode.style.display === 'flex') {
+                if (e.key === 'ArrowLeft') {
+                    // 上一张
+                    currentImageIndex = (currentImageIndex - 1 + currentFilteredImages.length) % currentFilteredImages.length;
+                    showImageInViewMode();
+                } else if (e.key === 'ArrowRight') {
+                    // 下一张
+                    currentImageIndex = (currentImageIndex + 1) % currentFilteredImages.length;
+                    showImageInViewMode();
+                } else if (e.key === 'Escape') {
+                    // 退出
+                    imageOnlyMode.style.display = 'none';
+                }
+            }
+        });
+
+        // 删除照片功能
+        // 为所有删除按钮添加点击事件
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.delete-btn')) {
+                e.stopPropagation(); // 阻止事件冒泡，避免触发图片详情查看
+                currentPhotoId = e.target.closest('.delete-btn').getAttribute('data-photo-id');
+                deleteModal.style.display = 'flex';
+            }
+        });
+
+        // 关闭删除确认模态框
+        function closeDeleteModalFunc() {
+            deleteModal.style.display = 'none';
+            currentPhotoId = null;
+        }
+
+        closeDeleteModal.addEventListener('click', closeDeleteModalFunc);
+        cancelDelete.addEventListener('click', closeDeleteModalFunc);
+
+        // 确认删除
+        confirmDelete.addEventListener('click', function() {
+            if (currentPhotoId) {
+                // 显示加载动画
+                loading.style.display = 'block';
+
+                // 发送删除请求
+                window.location.href = `/gallery/delete/${currentPhotoId}/`;
+            }
+        });
+
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                closeDeleteModalFunc();
+            }
+        });
+
+        // 纯图片浏览模式的删除功能
+        imageOnlyDeleteBtn.addEventListener('click', function() {
+            const currentImageId = this.getAttribute('data-photo-id');
+            if (confirm('确定要删除这张照片吗？此操作无法撤销。')) {
+                // 显示加载动画
+                loading.style.display = 'block';
+
+                window.location.href = `/gallery/delete/${currentImageId}/`;
+            }
+        });
+
+        // 刷新按钮功能
+        refreshBtn.addEventListener('click', function() {
+            window.location.reload();
+        });
+
+        // 为所有图片卡片添加点击事件打开详情模态框
+        document.querySelectorAll('.image-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // 确保点击的不是删除按钮
+                if (!e.target.closest('.delete-btn')) {
+                    const photoId = this.getAttribute('data-id');
+                    const photo = imageData.find(img => img.id === parseInt(photoId));
+                    if (photo) {
+                        openModal(photo);
+                    }
+                }
+            });
+        });
+
+        // 初始化页面时更新显示
+        updateGalleryDisplay(currentFilteredImages);
+    </script>
+</body>
+</html>
